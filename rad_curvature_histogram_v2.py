@@ -18,7 +18,9 @@ from skimage import feature
 #from scipy.optimize import curve_fit
 
 def eq_circle(x,R,x0,y0):
-    return (x[:,0]-x0)**2 + (x[:,1]-y0)**2 - R**2
+    N = np.shape(x)[0]
+    out = (x[0:np.int(N/2)]-x0)**2 + (x[np.int(N/2):N]-y0)**2 - R**2
+    return np.concatenate((out,np.zeros(np.shape(out))))
 
 def eq_circle_plus(x,R,x0,y0):
     return np.sqrt(R**2 - (x-x0)**2) + y0
@@ -36,8 +38,8 @@ def fit_circle_to_points2(x_in, y_in):
     x0_guess = (A1-A0)/(B0-B1);
     y0_guess = A0 + B0 * x0_guess;
     R_guess = np.sqrt((x_in[0]-x0_guess)**2 + (y_in[0]-y0_guess)**2)
-    data_fit = np.vstack((x_in,y_in)).T
-    par_out, pcov = sp.optimize.curve_fit(eq_circle,data_fit,np.zeros(np.shape(data_fit)),p0=(R_guess,x0_guess,y0_guess))
+    data_fit = np.hstack((x_in,y_in))
+    par_out = sp.optimize.curve_fit(eq_circle,data_fit,np.zeros(np.shape(data_fit)),p0=(R_guess,x0_guess,y0_guess))
     return par_out
 
 # Construct some test data
